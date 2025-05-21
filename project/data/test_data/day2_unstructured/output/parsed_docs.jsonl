@@ -1,0 +1,2 @@
+{"doc_id": "email_data/test_data/day2_unstructured/input/emails/test.eml", "source_type": "email", "title": "Test Email", "body": "This is a test email body.\nTesting our email parser functionality. ", "created_at": "2025-05-18"}
+{"doc_id": "pdf_data/test_data/day2_unstructured/input/pdfs/test.pdf", "source_type": "pdf", "title": "data/test_data/day2_unstructured/input/pdfs/test.pdf", "body": "This is a test PDF document\nTesting our PDF parser functionality\n", "created_at": "2025-05-18"}

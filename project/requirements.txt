@@ -1,0 +1,27 @@
+# Core dependencies
+python-dotenv==1.0.0
+pandas==2.2.3
+duckdb==0.10.2
+qdrant-client==1.14.2
+neo4j==5.13.0
+streamlit==1.27.0
+
+# LLM and embeddings
+langchain==0.0.300
+openai==1.3.0
+sentence-transformers==2.2.2
+
+# Document processing
+PyMuPDF==1.23.0  # for PDF processing
+spacy==3.7.0
+python-magic==0.4.27  # for file type detection
+
+# Visualization and metrics
+plotly==5.17.0
+pandas-profiling==3.2.0
+
+# Development
+pytest==7.4.2
+black==23.9.1
+isort==5.12.0
+mypy==1.5.1

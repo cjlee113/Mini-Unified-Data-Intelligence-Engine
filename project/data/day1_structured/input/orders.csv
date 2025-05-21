@@ -1,0 +1,9 @@
+order_id,customer,country,amount
+1,Alice,Japan,120
+2,Bob,USA,200
+3,Charlie,Japan,300
+4,Alice,Japan,180
+5,Bob,Japan,250
+6,Charlie,USA,100
+7,Alice,USA,90
+8,Bob,Japan,400 
