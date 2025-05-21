@@ -2,6 +2,20 @@
 
 A powerful data intelligence engine that integrates structured and unstructured data for enterprise search and analytics.
 
+## Note on Repository History
+
+The repository had to be reset due to large file issues. Initially, the virtual environment (`venv/`) and some large library files (like `libtorch_cpu.dylib` at 184MB and `libarrow.2000.dylib` at 52MB) were accidentally committed to git. These files exceeded GitHub's file size limits (100MB max per file). When trying to push, we encountered errors like:
+```
+remote: error: File venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.dylib is 184.26 MB; this exceeds GitHub's file size limit of 100.00 MB
+```
+
+To fix this, we had to:
+1. Create a new `.gitignore` to properly exclude `venv/` and large files
+2. Create a new branch without the large files
+3. Reset the repository history to remove the large files completely
+
+This is why the commit history appears minimal - we had to start fresh to properly handle the large files. For future development, the `.gitignore` is now properly configured to prevent these issues.
+
 ## Features
 
 - **Unified Data Integration**: Combines structured (CSV/SQL) and unstructured (text, PDF, email) data sources
