@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import fitz  # PyMuPDF
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 import streamlit as st
 from agents.router_agent import route_query
@@ -84,3 +85,24 @@ with st.sidebar:
     avg_time = metrics['average_query_time']
     if avg_time is not None:
         st.write(f"{avg_time:.2f} seconds")
+
+st.write("## Unstructured Data Upload & Entity Extraction")
+uploaded_file = st.file_uploader("Upload an unstructured file (email, text, or PDF)", type=["eml", "txt", "pdf"])
+if uploaded_file is not None:
+    if uploaded_file.name.endswith(".pdf"):
+        pdf_bytes = uploaded_file.read()
+        with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+            text = ""
+            for page in doc:
+                text += page.get_text()
+        st.write("Extracted text from PDF:")
+        st.write(text)
+    else:
+        content = uploaded_file.read()
+        try:
+            text = content.decode("utf-8")
+        except Exception:
+            text = str(content)
+        st.write("File content:")
+        st.write(text)
+    st.info("(Entity extraction demo: Add your extraction logic here.)")

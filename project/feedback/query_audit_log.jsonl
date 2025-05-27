@@ -1,3 +1,5 @@
 {"query": "Who ordered the most in Japan?", "tool_used": "SQLTool", "agent_output": "Customer who ordered the most in Japan: Bob (Total: 650)", "timestamp": "2025-05-21T13:30:09.720963", "duration": 0.929650068283081}
 {"query": "Who works at Microsoft?", "tool_used": "GraphTool", "agent_output": "People who work at Microsoft: Alice Brown", "timestamp": "2025-05-21T13:30:56.634533", "duration": 0.5934228897094727}
 {"query": "Who acquired OpenAI?", "tool_used": "GraphTool", "agent_output": "Companies that acquired OpenAI: Microsoft", "timestamp": "2025-05-21T13:31:21.285616", "duration": 0.7792150974273682}
+{"query": "who ordered the most in japan", "tool_used": "SQLTool", "agent_output": "Customer who ordered the most in Japan: Bob (Total: 650)", "timestamp": "2025-05-22T15:45:44.744406", "duration": 0.12417268753051758}
+{"query": "Who acquired OPENAI", "tool_used": "GraphTool", "agent_output": "Companies that acquired OPENAI: Microsoft", "timestamp": "2025-05-27T13:16:18.929722", "duration": 4.043429136276245}
