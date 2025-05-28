@@ -9,13 +9,13 @@ sys.path.append(project_root)
 from ingest.parse_unstructured import parse_email, parse_pdf, save_to_jsonl
 
 # Test email parsing
-email_path = "data/test_data/day2_unstructured/input/emails/test.eml"
+email_path = "project/data/test_data/day2_unstructured/input/emails/test.eml"
 parsed_email = parse_email(email_path)
 print("Parsed Email:")
 print(parsed_email)
 
 # Test PDF parsing
-pdf_path = "data/test_data/day2_unstructured/input/pdfs/test.pdf"
+pdf_path = "project/data/test_data/day2_unstructured/input/pdfs/test.pdf"
 parsed_pdf = parse_pdf(pdf_path)
 print("\nParsed PDF:")
 print(parsed_pdf)

@@ -1,6 +1,6 @@
-customer_id,name,email,country
-1,John Doe,john.doe@email.com,USA
-2,Jane Smith,jane.smith@email.com,Canada
-3,Bob Johnson,bob.j@email.com,UK
-4,Alice Brown,alice.b@email.com,Australia
-5,Charlie Wilson,charlie.w@email.com,USA
+customer_id,name,email,phone,country,signup_date,company
+1,Alice Brown,alice.brown@example.com,555-1234,Japan,2023-01-15,Acme Corp
+2,Bob Johnson,bob.johnson@example.com,555-5678,USA,2022-11-20,Globex Inc
+3,Charlie Wilson,charlie.wilson@example.com,555-8765,Japan,2023-03-10,Initech
+4,Jane Smith,jane.smith@example.com,555-4321,USA,2022-12-05,Acme Corp
+5,David Lee,david.lee@example.com,555-2468,Canada,2023-02-22,Globex Inc

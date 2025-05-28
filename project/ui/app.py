@@ -34,8 +34,7 @@ if st.button("Submit"):
     agent_output, tool_name = route_query(query)
     duration = time.time() - start_time
     log_query_audit(query, tool_name, agent_output, duration)
-    st.write("**Agent Output:**")
-    st.write(agent_output)
+    st.write(f"**Tool Used:** {tool_name}")
 
     # If OpenAI API key is set, send to GPT-4
     if OPENAI_API_KEY:

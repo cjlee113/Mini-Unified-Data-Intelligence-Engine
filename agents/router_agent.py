@@ -18,55 +18,64 @@ driver = GraphDatabase.driver(URI, auth=(USERNAME, PASSWORD))
 
 # Dummy tool classes
 def SQLTool(query):
-    con = duckdb.connect()
-    csv_path = "project/data/day1_structured/input/orders.csv"
-    con.execute(f"CREATE OR REPLACE TABLE orders AS SELECT * FROM read_csv_auto('{csv_path}')")
-    q = query.lower()
-    if "ordered the most in japan" in q:
-        result = con.execute("""
-            SELECT customer, SUM(amount) as total_amount
-            FROM orders
-            WHERE country = 'Japan'
-            GROUP BY customer
-            ORDER BY total_amount DESC
-            LIMIT 1
-        """).fetchone()
+    con = duckdb.connect("data/enterprise.db")
+
+    # Get table schemas and a few sample rows dynamically
+    tables = con.execute("SHOW TABLES").fetchall()
+    schema_str = ""
+    for (table_name,) in tables:
+        cols = con.execute(f"DESCRIBE {table_name}").fetchall()
+        col_str = ", ".join([f"{col[0]} ({col[1]})" for col in cols])
+        # Get 2 sample rows
+        sample_rows = con.execute(f"SELECT * FROM {table_name} LIMIT 2").fetchall()
+        sample_str = ""
+        if sample_rows:
+            sample_str = "\n  Sample rows:\n    " + "\n    ".join(str(row) for row in sample_rows)
+        schema_str += f"Table: {table_name} ({col_str}){sample_str}\n"
+
+    prompt = f"""
+    You are a data analyst. Given the following DuckDB database schema and sample data:
+    {schema_str}
+    Write a DuckDB SQL query to answer: \"{query}\"
+    - Only output the SQL query, nothing else.
+    - Make sure all columns in SELECT are either in GROUP BY or are aggregates.
+    - If you need to select a non-aggregated column that is functionally dependent on the GROUP BY, use ANY_VALUE().
+    - If both tables have a customer_id column, always join on o.customer_id = c.customer_id.
+    - If the user asks to see all rows or to 'show all', do not use LIMIT 1 and do not aggregate—return all matching rows.
+    """
+
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    response = openai.ChatCompletion.create(
+        model="gpt-4-turbo",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=200,
+        temperature=0
+    )
+    sql = response.choices[0].message.content.strip()
+    # Remove markdown code fences if present
+    if sql.startswith("```"):
+        sql = sql.split("```")[1]
+        # Remove 'sql' if present at the start
+        if sql.strip().startswith("sql"):
+            sql = sql.strip()[3:]
+        sql = sql.strip()
+
+    # Fix common join mistakes
+    sql = sql.replace("o.customer = c.name", "o.customer_id = c.customer_id")
+    sql = sql.replace("c.name = o.customer", "c.customer_id = o.customer_id")
+
+    try:
+        result = con.execute(sql).fetchall()
+        columns = [desc[0] for desc in con.description]
         con.close()
-        if result:
-            return f"Customer who ordered the most in Japan: {result[0]} (Total: {result[1]})"
-        else:
-            return "No orders found for Japan."
-    elif "show all orders from japan" in q:
-        result = con.execute("""
-            SELECT * FROM orders WHERE country = 'Japan'
-        """).fetchall()
+        # Format result as a table
+        result_str = "\t".join(columns) + "\n"
+        for row in result:
+            result_str += "\t".join(str(x) for x in row) + "\n"
+        return f"SQL: {sql}\n\nResult:\n{result_str}"
+    except Exception as e:
         con.close()
-        if result:
-            return f"Orders from Japan: {result}"
-        else:
-            return "No orders found for Japan."
-    elif "customers who placed orders in january" in q or "customers who ordered in january" in q:
-        result = con.execute("""
-            SELECT DISTINCT customer FROM orders WHERE LOWER(month) = 'january'
-        """).fetchall()
-        con.close()
-        if result:
-            customers = ', '.join(r[0] for r in result)
-            return f"Customers who placed orders in January: {customers}"
-        else:
-            return "No customers found for January."
-    elif "total amount ordered by each customer" in q:
-        result = con.execute("""
-            SELECT customer, SUM(amount) as total_amount FROM orders GROUP BY customer
-        """).fetchall()
-        con.close()
-        if result:
-            return "Total amount ordered by each customer: " + ', '.join(f"{r[0]}: {r[1]}" for r in result)
-        else:
-            return "No orders found."
-    else:
-        con.close()
-        return f"[SQLTool] Executed SQL query: {query}"
+        return f"Failed to execute generated SQL: {sql}\nError: {str(e)}"
 
 def VectorTool(query):
     q = query.lower()
@@ -175,13 +184,13 @@ def llm_tool_router(question, openai_api_key=None):
         return None
     openai.api_key = openai_api_key
     try:
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
+        response = openai.ChatCompletion.create(
+            model="gpt-4-turbo",
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=5,
             temperature=0
         )
-        tool = response.choices[0].text.strip()
+        tool = response.choices[0].message.content.strip()
         if tool in ["SQLTool", "GraphTool", "VectorTool"]:
             return tool
     except Exception as e:

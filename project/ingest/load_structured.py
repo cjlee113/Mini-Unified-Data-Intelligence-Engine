@@ -10,29 +10,35 @@ import os
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Connect to a database
-conn = duckdb.connect(os.path.join(project_root, 'data/enterprise.db'))
+db_path = os.path.join(project_root, 'data/enterprise.db')
+conn = duckdb.connect(db_path)
 
-# Load customer data
+# Drop old tables if they exist
+conn.execute("DROP TABLE IF EXISTS customers")
+conn.execute("DROP TABLE IF EXISTS orders")
+conn.execute("DROP TABLE IF EXISTS staging_customers")
+conn.execute("DROP TABLE IF EXISTS staging_orders")
+
+# Load new data
 customers = pd.read_csv(os.path.join(project_root, 'data/test_data/day1_structured/input/customers.csv'))
-conn.execute("CREATE TABLE IF NOT EXISTS customers AS SELECT * FROM customers")
-
-# Load order data
 orders = pd.read_csv(os.path.join(project_root, 'data/test_data/day1_structured/input/orders.csv'))
-conn.execute("CREATE TABLE IF NOT EXISTS orders AS SELECT * FROM orders")
 
-# Save normalized tables
-conn.execute("CREATE TABLE IF NOT EXISTS staging_customers AS SELECT * FROM customers")
-conn.execute("CREATE TABLE IF NOT EXISTS staging_orders AS SELECT * FROM orders")
+# Create tables
+conn.execute("CREATE TABLE customers AS SELECT * FROM customers")
+conn.execute("CREATE TABLE orders AS SELECT * FROM orders")
+conn.execute("CREATE TABLE staging_customers AS SELECT * FROM customers")
+conn.execute("CREATE TABLE staging_orders AS SELECT * FROM orders")
 
 # Test query to verify data
 result = conn.execute("""
     SELECT 
         c.name,
+        c.email,
         COUNT(o.order_id) as order_count,
         SUM(o.amount) as total_spent
     FROM customers c
     LEFT JOIN orders o ON c.customer_id = o.customer_id
-    GROUP BY c.name
+    GROUP BY c.customer_id, c.name, c.email
     ORDER BY total_spent DESC
 """).df()
 

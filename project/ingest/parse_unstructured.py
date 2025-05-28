@@ -36,11 +36,11 @@ def parse_email(email_path):
     }
 # Save to jsonl
 def save_to_jsonl(documents):
-    """Save parsed documents to parsed_docs.jsonl in the day2 output directory"""
-    output_dir = "data/test_data/day2_unstructured/output"
+    """Save parsed documents to parsed_docs.jsonl in the fixed output directory (append mode)"""
+    output_dir = "project/data/test_data/day2_unstructured/output"
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, "parsed_docs.jsonl")
-    
-    with open(output_path, 'w') as f:
+
+    with open(output_path, 'a') as f:  # Use append mode
         for doc in documents:
             f.write(json.dumps(doc) + '\n')
